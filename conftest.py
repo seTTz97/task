@@ -1,7 +1,9 @@
 import pytest
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
-
+from typing import Tuple
 
 
 class GitRepository:
@@ -88,3 +90,63 @@ class GitRepository:
         """Read a file from the repository."""
         return (self.path / name).read_text()
 
+
+@pytest.fixture
+def temp_dir() -> Path:
+    """Provide a temporary directory that is cleaned up after the test."""
+    tmp = Path(tempfile.mkdtemp())
+    yield tmp
+    shutil.rmtree(tmp, ignore_errors=True)
+
+
+@pytest.fixture
+def git_repo(temp_dir: Path) -> GitRepository:
+    """Provide an initialized (non-bare) Git repository."""
+    repo_path = temp_dir / "repo"
+    repo_path.mkdir()
+    repo = GitRepository(repo_path)
+    repo.init()
+    return repo
+
+
+@pytest.fixture
+def bare_repo(temp_dir: Path) -> GitRepository:
+    """Provide an initialized bare Git repository."""
+    repo_path = temp_dir / "bare_repo.git"
+    repo_path.mkdir()
+    repo = GitRepository(repo_path, is_bare=True)
+    repo.init(bare=True)
+    return repo
+
+
+@pytest.fixture
+def client_server_setup(temp_dir: Path) -> Tuple[GitRepository, GitRepository, GitRepository]:
+    """
+    Provide a server (bare repo) and two clients with an initial commit.
+
+    Returns:
+        Tuple of (server, client1, client2) GitRepository instances.
+        - server: bare repository acting as the remote
+        - client1: first client clone with origin pointing to server
+        - client2: second client clone with origin pointing to server
+    """
+    server_path = temp_dir / "server.git"
+    server_path.mkdir()
+    server = GitRepository(server_path, is_bare=True)
+    server.init(bare=True)
+
+    client1_path = temp_dir / "client1"
+    client1_path.mkdir()
+    client1 = GitRepository(client1_path)
+    client1.init()
+    client1.create_file("initial.txt", "initial content")
+    client1.add("initial.txt")
+    client1.commit("Initial commit")
+    client1.run("remote", "add", "origin", str(server.path))
+    branch = client1.get_branch()
+    client1.run("push", "-u", "origin", branch)
+
+    client2_path = temp_dir / "client2"
+    client2 = server.clone_to(client2_path)
+
+    return server, client1, client2
