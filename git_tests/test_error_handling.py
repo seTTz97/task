@@ -7,7 +7,6 @@ class TestConnectionErrors:
     """Tests for connection-related errors."""
 
     def test_clone_nonexistent_repository(self, temp_dir: Path):
-        """Verify appropriate error when cloning non-existent repo."""
         clone_path = temp_dir / "clone"
 
         result = subprocess.run(
@@ -17,10 +16,10 @@ class TestConnectionErrors:
         )
 
         assert result.returncode != 0
-        assert "not found" in result.stderr.lower() or "does not exist" in result.stderr.lower() or "fatal" in result.stderr.lower()
+        stderr = result.stderr.lower()
+        assert "not found" in stderr or "does not exist" in stderr or "fatal" in stderr
 
     def test_push_to_nonexistent_remote(self, git_repo):
-        """Verify appropriate error when pushing to non-existent remote."""
         git_repo.create_file("test.txt", "content")
         git_repo.add("test.txt")
         git_repo.commit("Initial")
@@ -31,7 +30,6 @@ class TestConnectionErrors:
         assert result.returncode != 0
 
     def test_push_when_remote_removed(self, client_server_setup, temp_dir: Path):
-        """Verify error handling when server repository is removed."""
         server, client1, _ = client_server_setup
 
         import shutil

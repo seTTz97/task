@@ -1,7 +1,9 @@
+import random
+import string
+
 import pytest
 import subprocess
 from pathlib import Path
-
 
 
 class TestGitInit:
@@ -57,6 +59,19 @@ class TestGitAdd:
         status = git_repo.run("status", "--porcelain")
         assert "A  test.txt" in status.stdout
 
+    def test_add_single_file_with_special_chars(self, git_repo):
+        special_chars = string.punctuation
+        random_specials = ''.join(random.choice(special_chars) for _ in range(10))
+        file_name = f"{random_specials}.txt"
+
+        git_repo.create_file(file_name, "Hello, World!")
+
+        result = git_repo.add(file_name)
+        assert result.returncode == 0
+
+        status = git_repo.run("status", "--porcelain")
+        assert file_name in status.stdout
+
     def test_add_multiple_files(self, git_repo):
         git_repo.create_file("file1.txt", "Content 1")
         git_repo.create_file("file2.txt", "Content 2")
@@ -87,6 +102,7 @@ class TestGitAdd:
 
 
 class TestGitCommit:
+    """Tests for git commit command."""
 
     def test_commit_creates_commit_object(self, git_repo):
         git_repo.create_file("test.txt", "Hello")
