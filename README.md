@@ -9,15 +9,16 @@ This test suite validates Git's core functionality and client-server communicati
 ## Test Structure
 
 ```
-git_tests/
-├── test_basic_operations.py # Core Git command tests
-├── test_client_server.py    # Client-server communication tests
-├── test_protocols.py        # Protocol-specific tests (file, SSH, HTTP, git://)
-└── test_error_handling.py   # Error handling and edge cases
-conftest.py              # Pytest fixtures and helpers
-pytest.ini               # Pytest configuration
-requirements.txt         # Python dependencies
-README.md                # This documentation
+task/
+├── conftest.py              # Pytest fixtures and helpers
+├── pytest.ini               # Pytest configuration
+├── requirements.txt         # Python dependencies
+├── README.md                # This documentation
+└── git_tests/
+    ├── test_basic_operations.py # Core Git command tests
+    ├── test_client_server.py    # Client-server communication tests
+    ├── test_protocols.py        # Protocol-specific tests (file, SSH, HTTP, git://)
+    └── test_error_handling.py   # Error handling and edge cases
 ```
 
 ## Test Categories

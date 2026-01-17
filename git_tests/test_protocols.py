@@ -46,7 +46,6 @@ class TestFileProtocol:
         work.run("remote", "add", "origin", f"file://{bare_repo.path}")
         work.run("push", "-u", "origin", work.get_branch())
 
-        # Clone using file:// URL
         clone_path = temp_dir / "clone"
         result = subprocess.run(
             ["git", "clone", f"file://{bare_repo.path}", str(clone_path)],
@@ -97,7 +96,6 @@ class TestSSHProtocol:
     @pytest.fixture
     def ssh_available(self) -> bool:
         """Check if SSH is available for testing."""
-        # Check if we can connect to localhost SSH
         try:
             result = subprocess.run(
                 ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=2",
@@ -236,7 +234,6 @@ class TestProtocolNegotiation:
         work.run("remote", "add", "origin", str(bare_repo.path))
         work.run("push", "-u", "origin", work.get_branch())
 
-        # Clone with protocol v2
         clone_path = temp_dir / "clone"
         result = subprocess.run(
             ["git", "-c", "protocol.version=2", "clone",
