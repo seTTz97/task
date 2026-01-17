@@ -90,9 +90,9 @@ class TestConflictScenarios:
 
         content = client2.read_file("conflict.txt")
 
-        if "<<<<<<" in content:
-            assert "=======" in content
-            assert ">>>>>>>" in content
+        assert "<<<<<<" in content, "Expected conflict markers in file"
+        assert "=======" in content
+        assert ">>>>>>>" in content
 
 
 class TestEdgeCases:

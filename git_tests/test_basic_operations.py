@@ -60,9 +60,7 @@ class TestGitAdd:
         assert "A  test.txt" in status.stdout
 
     def test_add_single_file_with_special_chars(self, git_repo):
-        special_chars = string.punctuation
-        random_specials = ''.join(random.choice(special_chars) for _ in range(10))
-        file_name = f"{random_specials}.txt"
+        file_name = "+)'?$>%!.txt"
 
         git_repo.create_file(file_name, "Hello, World!")
 
